@@ -17,3 +17,12 @@ but how to find what UID to set to?
    * UID is 1883
    * ref https://docs.docker.com/engine/reference/commandline/top/
 3. `sudo chown -R 1883 datadir/mosquitto/`
+
+
+# setup server
+make sure system time is correct https://vitux.com/keep-your-clock-sync-with-internet-time-servers-in-ubuntu/
+
+# OTA
+gotta set that up manualy
+https://docs.platformio.org/en/latest/platforms/espressif8266.html#over-the-air-ota-update
+https://tttapa.github.io/ESP8266/Chap13%20-%20OTA.html
