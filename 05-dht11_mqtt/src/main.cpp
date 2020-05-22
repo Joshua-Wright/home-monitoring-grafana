@@ -1,45 +1,52 @@
+#include <Arduino.h>
+
 /**
     Required libraries:
-      - DHT sensor library by Adafruit
-      - Adafruit Unified Sensor
       - PubSubClient
+      - DHT11
 **/
-
-#include <DHT.h>
+#include <Wire.h>
+#include <SPI.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <DHT.h>
 
-#define DHTPIN D4
-#define DHTTYPE DHT22
 
-#define MQTT_TOPIC_HUMIDITY "home/dht22/humidity"
-#define MQTT_TOPIC_TEMPERATURE "home/dht22/temperature"
-#define MQTT_TOPIC_STATE "home/dht22/status"
-#define MQTT_PUBLISH_DELAY 60000
-#define MQTT_CLIENT_ID "esp8266dht22"
+// must define MQTT_SERVER, MQTT_USER, MQTT_PASSWORD, WIFI_SSID, WIFI_PASSWORD
+#include "secrets.h"
 
-const char* WIFI_SSID = "your-ssid";
-const char* WIFI_PASSWORD = "your-password";
+#define DHTPIN 2
+#define DHTTYPE DHT11
 
-const char *MQTT_SERVER = "homeserver";
-const char *MQTT_USER = "mqttuser"; // NULL for no authentication
-const char *MQTT_PASSWORD = "mqttpassword"; // NULL for no authentication
 
-float humidity;
-float temperature;
+#define MQTT_TOPIC_HUMIDITY "home/dht11/humidity"
+#define MQTT_TOPIC_TEMPERATURE "home/dht11/temperature"
+#define MQTT_TOPIC_STATE "home/dht11/status"
+#define MQTT_PUBLISH_DELAY 3000
+#define MQTT_CLIENT_ID "esp8266dht11"
+
+
+
+float humidity = 0.5;
+float temperature = 0.5;
 long lastMsgTime = 0;
 
-DHT dht(DHTPIN, DHTTYPE);
+
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
+DHT dht(DHTPIN, DHTTYPE);
+
+void setupWifi();
+void mqttReconnect();
+void mqttPublish(char *topic, float payload);
 
 void setup() {
   Serial.begin(115200);
   while (! Serial);
+  dht.begin();
 
   setupWifi();
   mqttClient.setServer(MQTT_SERVER, 1883);
-  dht.begin();
 }
 
 void loop() {
@@ -52,11 +59,15 @@ void loop() {
   if (now - lastMsgTime > MQTT_PUBLISH_DELAY) {
     lastMsgTime = now;
 
-    // Reading DHT22 sensor data
+    // Reading temperature or humidity takes about 250 milliseconds!
+    // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
     humidity = dht.readHumidity();
+    // Read temperature as Celsius (the default)
     temperature = dht.readTemperature();
+
+    // Check if any reads failed and exit early (to try again).
     if (isnan(humidity) || isnan(temperature)) {
-      Serial.println("DHT22 sensor is not ready yet");
+      Serial.println(F("Failed to read from DHT sensor!"));
       return;
     }
 
@@ -102,7 +113,7 @@ void mqttReconnect() {
   }
 }
 
-void mqttPublish(char* topic, float payload) {
+void mqttPublish(char *topic, float payload) {
   Serial.print(topic);
   Serial.print(": ");
   Serial.println(payload);
