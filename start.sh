@@ -1,3 +1,3 @@
 #!/bin/sh
-export DATA_DIR=/mnt/nas
+export DATA_DIR=$(pwd)/datadir
 docker-compose up -d
