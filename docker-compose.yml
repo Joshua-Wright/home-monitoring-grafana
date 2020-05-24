@@ -41,3 +41,18 @@ services:
       - mosquitto
       - influxdb
     restart: always
+
+  temtop-bridge:
+    build: ./temtop-elitech-cloud-bridge
+    image: jwright/temtop-elitech-cloud-bridge
+    container_name: temtop-elitech-cloud-bridge
+    depends_on:
+      - influxdb
+    restart: always
+    environment:
+      TEMPTOP_USER: "${TEMPTOP_USER}"
+      TEMPTOP_PASS: "${TEMPTOP_PASS}"
+      INFLUXDB_ADDRESS: "${INFLUXDB_ADDRESS}"
+      INFLUXDB_USER: "${INFLUXDB_USER}"
+      INFLUXDB_PASSWORD: "${INFLUXDB_PASSWORD}"
+      INFLUXDB_DATABASE: "${INFLUXDB_DATABASE}"
