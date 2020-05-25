@@ -45,7 +45,7 @@ services:
   temtop-bridge:
     build: ./temtop-elitech-cloud-bridge
     image: jwright/temtop-elitech-cloud-bridge
-    container_name: temtop-elitech-cloud-bridge
+    container_name: temtop-bridge
     depends_on:
       - influxdb
     restart: always

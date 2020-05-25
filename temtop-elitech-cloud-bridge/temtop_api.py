@@ -53,8 +53,8 @@ class TemtopApi:
             'method'    : 'getList',
             'page'      : '1',
             'rows'      : '4500',
-            'startDate' : startDateTime.isoformat(sep=' ', timespec='seconds'),
-            'endDate'   : endDateTime.isoformat(sep=' ', timespec='seconds'),
+            'startDate' : startDateTime.replace(tzinfo=None).isoformat(sep=' ', timespec='seconds'),
+            'endDate'   : endDateTime.replace(tzinfo=None).isoformat(sep=' ', timespec='seconds'),
             'deviceId'  : deviceId,
         }
         return self.get('http://www.i-elitech.com//apiDeviceDataAction.do', params=params)['rows']

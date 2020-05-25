@@ -16,6 +16,7 @@ INFLUXDB_DATABASE = os.environ.get('INFLUXDB_DATABASE')
 
 influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
 
+timezone = pytz.timezone("America/Chicago")
 
 
 def _init_influxdb_database():
@@ -34,7 +35,7 @@ def main():
 
         deviceId = temtopApi.getFirstDeviceId()
         
-        endDateTime = datetime.now()
+        endDateTime = timezone.normalize(datetime.utcnow().replace(tzinfo=pytz.utc))
         startDateTime = endDateTime - timedelta(minutes=30)
         # end 5 minutes in the future, just in case there is some time skew
         endDateTime += timedelta(minutes=5)
