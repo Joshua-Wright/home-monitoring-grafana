@@ -36,9 +36,11 @@ def main():
         
         endDateTime = datetime.now()
         startDateTime = endDateTime - timedelta(minutes=30)
-        # startDateTime = endDateTime - timedelta(days=30)
         # end 5 minutes in the future, just in case there is some time skew
         endDateTime += timedelta(minutes=5)
+        print('querying for:')
+        print(f'\tstartDateTime: {startDateTime}')
+        print(f'\tendDateTime:   {endDateTime}')
         deviceData = temtopApi.getM10iDeviceData(
             deviceId=deviceId,
             startDateTime=startDateTime,
@@ -51,12 +53,11 @@ def main():
             for reading_name in temtopApi.readings:
                 reading = d[reading_name]
                 point = {
-                    'time': timestamp.astimezone(pytz.utc),
+                    'time': timestamp,
                     'measurement': reading_name,
                     'tags': { 'location': 'M10i' },
                     'fields': { 'value': reading },
                 }
-                print(point)
                 points.append(point)
         print(f'writing {len(points)} to influxdb')
         success = influxdb_client.write_points(points)

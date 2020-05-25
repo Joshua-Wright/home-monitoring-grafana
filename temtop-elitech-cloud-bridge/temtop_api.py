@@ -63,15 +63,16 @@ class TemtopApi:
         data = self.getDeviceData(deviceId, startDateTime, endDateTime)
         
         def parseDate(createTime) -> datetime:
-            return datetime(
+            d = datetime(
                 day     = createTime['date'],
                 hour    = createTime['hours'],
                 minute  = createTime['minutes'],
                 month   = createTime['month']+1,
                 second  = createTime['seconds'],
                 year    = createTime['year']+1900,
-                tzinfo  = self.timezone,
+                tzinfo  = None,
             )
+            return self.timezone.localize(d)
         return [
             {
                 # 'originaldatetime': d['createTime'],

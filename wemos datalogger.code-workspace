@@ -1,7 +1,8 @@
 {
 	"folders": [
 		{"path": "."},
-		{"path": "05-dht11_mqtt"}
+		{"path": "05-dht11_mqtt"},
+		{"path": "temtop-elitech-cloud-bridge"}
 	],
 	"settings": {}
 }
