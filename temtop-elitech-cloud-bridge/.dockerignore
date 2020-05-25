@@ -3,3 +3,5 @@ Dockerfile
 *~
 .DS_Store
 README.md
+.vscode/settings.json
+env_local.sh
