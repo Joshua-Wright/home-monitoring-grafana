@@ -7,6 +7,7 @@ This script receives MQTT data and saves those to InfluxDB.
 """
 
 import re
+import json
 from typing import NamedTuple
 
 import paho.mqtt.client as mqtt
@@ -31,7 +32,12 @@ class SensorData(NamedTuple):
     location: str
     measurement: str
     value: float
+    value_str: str
 
+class SensorDataJson(NamedTuple):
+    location: str
+    measurement: str
+    value_dict: dict
 
 def on_connect(client, userdata, flags, rc):
     """ The callback for when the client receives a CONNACK response from the server."""
@@ -54,7 +60,12 @@ def _parse_mqtt_message(topic, payload):
         measurement = match.group(2)
         if measurement == 'status':
             return None
-        return SensorData(location, measurement, float(payload))
+        if measurement == 'system_info' or measurement.endswith('json'):
+            return SensorDataJson(location, measurement, json.loads(payload))
+        try:
+            return SensorData(location, measurement, float(payload), None)
+        except ValueError:
+            return SensorData(location, measurement, None, payload)
     else:
         return None
 
@@ -65,12 +76,20 @@ def _send_sensor_data_to_influxdb(sensor_data):
             'measurement': sensor_data.measurement,
             'tags': {
                 'location': sensor_data.location
-            },
-            'fields': {
-                'value': sensor_data.value
             }
         }
     ]
+
+    if isinstance(sensor_data, SensorData):
+        json_body[0]['fields'] = {}
+        if sensor_data.value is not None:
+            json_body[0]['fields']['value'] = sensor_data.value
+        if sensor_data.value_str is not None:
+            json_body[0]['fields']['value_str'] = sensor_data.value_str
+
+    elif isinstance(sensor_data, SensorDataJson):
+        json_body[0]['fields'] = sensor_data.value_dict
+
     influxdb_client.write_points(json_body)
 
 
