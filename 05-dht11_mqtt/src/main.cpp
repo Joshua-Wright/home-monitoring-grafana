@@ -57,6 +57,7 @@ void setup() {
   dht.begin();
 
   setupWifi();
+  mqttClient.setBufferSize(512);
   mqttClient.setServer(MQTT_SERVER, 1883);
 
   ESP.wdtEnable(1000);
@@ -115,12 +116,24 @@ void loop() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void publishSensorStartupInfo() {
-  mqttPublish(MQTT_TOPIC "/SketchMD5",       ESP.getSketchMD5());
-  mqttPublish(MQTT_TOPIC "/SketchSize",      ESP.getSketchSize());
-  mqttPublish(MQTT_TOPIC "/FreeSketchSpace", ESP.getFreeSketchSpace());
-  mqttPublish(MQTT_TOPIC "/ResetInfo",       ESP.getResetInfo());
-  mqttPublish(MQTT_TOPIC "/ResetReason",     ESP.getResetReason());
-  mqttPublish(MQTT_TOPIC "/FullVersion",     ESP.getFullVersion());
+  const size_t capacity = JSON_OBJECT_SIZE(10) + 512;
+  DynamicJsonDocument doc(capacity);
+
+  doc[F("ResetInfo")]        = ESP.getResetInfo();
+  doc[F("ResetReason")]      = ESP.getResetReason();
+  doc[F("LocalIP")]          = WiFi.localIP().toString();
+  doc[F("MacAddress")]       = WiFi.macAddress();
+  doc[F("SSID")]             = WiFi.SSID();
+  doc[F("BSSIDstr")]         = WiFi.BSSIDstr();
+  doc[F("SketchMD5")]        = ESP.getSketchMD5();
+  doc[F("SketchSize")]       = ESP.getSketchSize();
+  doc[F("FreeSketchSpace")]  = ESP.getFreeSketchSpace();
+  doc[F("FullVersion")]      = ESP.getFullVersion();
+
+  String json;
+  serializeJson(doc, json);
+  mqttPublish(MQTT_TOPIC "/startup_info_json", json);
+  // publishSensorStats();
 }
 
 void publishSensorStats() {
@@ -129,18 +142,18 @@ void publishSensorStats() {
   uint8_t hfrag;
   ESP.getHeapStats(&hfree, &hmax, &hfrag);
 
-  const size_t capacity = JSON_OBJECT_SIZE(9);
+  const size_t capacity = JSON_OBJECT_SIZE(9) + 256;
   DynamicJsonDocument doc(capacity);
 
-  doc["hfree"] = hfree;
-  doc["hmax"] = hmax;
-  doc["hfrag"] = hfrag;
-  doc["CycleCount"] = ESP.getCycleCount();
-  doc["Vcc"] = ESP.getVcc();
-  doc["FreeContStack"] = ESP.getFreeContStack();
-  doc["mqttMessagesSent"] = mqttMessagesSent;
-  doc["dht11SuccessfulReadings"] = dht11SuccessfulReadings;
-  doc["dht11TotalReadings"] = dht11TotalReadings;
+  doc[F("hfree")]                   = hfree;
+  doc[F("hmax")]                    = hmax;
+  doc[F("hfrag")]                   = hfrag;
+  doc[F("CycleCount")]              = ESP.getCycleCount();
+  doc[F("Vcc")]                     = ESP.getVcc();
+  doc[F("FreeContStack")]           = ESP.getFreeContStack();
+  doc[F("mqttMessagesSent")]        = mqttMessagesSent;
+  doc[F("dht11SuccessfulReadings")] = dht11SuccessfulReadings;
+  doc[F("dht11TotalReadings")]      = dht11TotalReadings;
   String json = "";
   serializeJson(doc, json);
   mqttPublish(MQTT_TOPIC "/system_info", json);
@@ -217,7 +230,9 @@ void mqttPublish(const char *topic, float payload) {
   Serial.print(": ");
   Serial.println(payload);
 
-  mqttClient.publish(topic, String(payload).c_str(), true);
+  if (!mqttClient.publish(topic, String(payload).c_str(), true)) {
+    Serial.println("failed to send MQTT message!");
+  }
   mqttMessagesSent++;
 }
 
@@ -226,7 +241,9 @@ void mqttPublish(const char *topic, const char* payload) {
   Serial.print(": ");
   Serial.println(payload);
 
-  mqttClient.publish(topic, payload, true);
+  if (!mqttClient.publish(topic, payload, true)) {
+    Serial.println("failed to send MQTT message!");
+  }
   mqttMessagesSent++;
 }
 
@@ -235,6 +252,8 @@ void mqttPublish(const char *topic, String payload) {
   Serial.print(": ");
   Serial.println(payload);
 
-  mqttClient.publish(topic, payload.c_str(), true);
+  if (!mqttClient.publish(topic, payload.c_str(), true)) {
+    Serial.println("failed to send MQTT message!");
+  }
   mqttMessagesSent++;
 }
