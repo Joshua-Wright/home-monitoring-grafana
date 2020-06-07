@@ -6,5 +6,5 @@
 ## more details
 I used tcpdump and wireshark to reverse engineer the HTTP API that backs the android app that came with my wifi-connected air quality sensor.
 Reverse engineering the app's API turned out to be easier than expected because it uses only unencrypted HTTP, cookie-based sessions, and the password is transmitted in plain text. (It's a good thing this isn't a door lock!)
-I wrote a simple script to poll the reverse-engineered API and write data to influxdb so I can add it to my grafana dashboard.
+I wrote a simple script to poll the reverse-engineered API and write data to influxdb and add it to my grafana dashboard.
 

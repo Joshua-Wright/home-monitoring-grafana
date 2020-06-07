@@ -26,3 +26,28 @@ make sure system time is correct https://vitux.com/keep-your-clock-sync-with-int
 gotta set that up manualy
 https://docs.platformio.org/en/latest/platforms/espressif8266.html#over-the-air-ota-update
 https://tttapa.github.io/ESP8266/Chap13%20-%20OTA.html
+
+
+# using `influx` command-line interface
+influxdb query documentation https://docs.influxdata.com/influxdb/v1.8/query_language/explore-data/
+```bash
+export DATA_DIR=$(pwd)/datadir
+docker-compose up -d --no-deps --build mqttbridge
+
+
+docker exec -it influxdb bash
+root@a5d0beabd98e:/# influx
+> show databases
+name: databases
+name
+----
+home_db
+_internal
+> use home_db
+Using database home_db
+
+show measurements
+show series
+
+```
+
