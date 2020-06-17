@@ -2,6 +2,7 @@ import os
 from influxdb import InfluxDBClient
 from datetime import datetime, timedelta
 from time import sleep
+import random
 import speedtest
 
 servers = []
@@ -20,6 +21,16 @@ def do_speed_test():
     s.upload(threads=threads)
     s.results.share()
     return s.results.dict()
+
+min_wait = 0.5 # hours
+max_wait = 2.0 # hours
+
+def random_wait():
+    wait_sec = random.randrange(int(60*60*min_wait), int(60*60*max_wait))
+    delay = timedelta(seconds=wait_sec)
+    next_run = datetime.now() + delay
+    print(f'waiting {delay}, until {next_run}')
+    sleep(wait_sec)
 
 
 INFLUXDB_ADDRESS  = os.environ.get('INFLUXDB_ADDRESS')
@@ -42,6 +53,7 @@ def main():
 
     while True:
 
+        print('running speed test')
         result = do_speed_test()
         data_point = {
             'time': result['timestamp'],
@@ -76,11 +88,8 @@ def main():
         success = influxdb_client.write_points([data_point])
         print(success)
 
-        # TODO: random wait time from 30m to 2h?
-        sleep(10)
-        # return
-        # sleep(10*60)
+        random_wait()
 
 if __name__ == '__main__':
-    print('periodic network speed test')
+    print('begin periodic network speed test')
     main()
