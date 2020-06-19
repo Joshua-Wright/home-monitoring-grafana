@@ -56,3 +56,16 @@ services:
       INFLUXDB_USER: "${INFLUXDB_USER}"
       INFLUXDB_PASSWORD: "${INFLUXDB_PASSWORD}"
       INFLUXDB_DATABASE: "${INFLUXDB_DATABASE}"
+
+  speedtest:
+    build: ./speedtest
+    image: jwright/speedtest
+    container_name: speedtest
+    depends_on:
+      - influxdb
+    restart: always
+    environment:
+      INFLUXDB_ADDRESS: "${INFLUXDB_ADDRESS}"
+      INFLUXDB_USER: "${INFLUXDB_USER}"
+      INFLUXDB_PASSWORD: "${INFLUXDB_PASSWORD}"
+      INFLUXDB_DATABASE: "${INFLUXDB_DATABASE}"
