@@ -1,7 +1,7 @@
-FROM python:3.7-alpine
+FROM python:3.7-buster
 
 COPY requirements.txt /
-RUN pip install -r /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
 COPY . /app
 WORKDIR /app
