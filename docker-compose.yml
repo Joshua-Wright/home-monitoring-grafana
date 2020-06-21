@@ -69,3 +69,16 @@ services:
       INFLUXDB_USER: "${INFLUXDB_USER}"
       INFLUXDB_PASSWORD: "${INFLUXDB_PASSWORD}"
       INFLUXDB_DATABASE: "${INFLUXDB_DATABASE}"
+
+  network-data-usage:
+    build: ./network-data-usage
+    image: jwright/network-data-usage
+    container_name: network-data-usage
+    depends_on:
+      - influxdb
+    restart: always
+    environment:
+      INFLUXDB_ADDRESS: "${INFLUXDB_ADDRESS}"
+      INFLUXDB_USER: "${INFLUXDB_USER}"
+      INFLUXDB_PASSWORD: "${INFLUXDB_PASSWORD}"
+      INFLUXDB_DATABASE: "${INFLUXDB_DATABASE}"
