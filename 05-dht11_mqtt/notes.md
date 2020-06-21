@@ -51,3 +51,8 @@ show series
 
 ```
 
+# how to make python requirements.txt docker image
+```bash
+pipenv lock --requirements > requirements.txt
+```
+

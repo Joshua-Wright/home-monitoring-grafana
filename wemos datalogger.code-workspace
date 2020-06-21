@@ -3,7 +3,8 @@
 		{"path": "."},
 		{"path": "05-dht11_mqtt"},
 		{"path": "temtop-elitech-cloud-bridge"},
-		{"path": "speedtest"}
+		{"path": "speedtest"},
+		{"path": "network-data-usage"}
 	],
 	"settings": {}
 }
