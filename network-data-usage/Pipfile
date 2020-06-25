@@ -6,6 +6,9 @@ verify_ssl = true
 [dev-packages]
 rope = "*"
 ipython = "*"
+# when having debugpy this, you gotta do `pipenv lock --pre`
+#debugpy = "*"
+#ipykernel = "*"
 
 [packages]
 pandas = "*"
@@ -15,3 +18,6 @@ lxml = "*"
 
 [requires]
 python_version = "3.6"
+
+#[pipenv]
+#allow_prereleases = true

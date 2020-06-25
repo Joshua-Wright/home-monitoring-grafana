@@ -6,5 +6,7 @@
 		{"path": "speedtest"},
 		{"path": "network-data-usage"}
 	],
-	"settings": {}
+	"settings": {
+		"python.dataScience.jupyterServerURI": "local"
+	}
 }

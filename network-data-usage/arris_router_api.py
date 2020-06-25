@@ -30,8 +30,10 @@ def get_devices_info():
 
 
 def get_device_stats(dfs, devices_info, timestamp):
-    wifi_clients = dfs[6].set_index(dfs[6].columns[0], drop=False)
-    ethernet_clients = dfs[7].set_index(dfs[7].columns[0]).transpose()
+    wifi_clients = dfs[7]
+    ethernet_clients = dfs[8]
+    wifi_clients = wifi_clients.set_index(wifi_clients.columns[0], drop=False)
+    ethernet_clients = ethernet_clients.set_index(ethernet_clients.columns[0]).transpose()
     ethernet_clients['ethernet_port'] = ethernet_clients.index
     df = pd.concat([wifi_clients, ethernet_clients])
     df['timestamp'] = timestamp
@@ -45,9 +47,9 @@ def get_device_stats(dfs, devices_info, timestamp):
     return m
 
 def get_wifi_radio_stats(dfs):
-    wifi_network_config = dfs[4].set_index('Unnamed: 0').dropna(how='all')
+    wifi_network_config = dfs[5].set_index('Unnamed: 0').dropna(how='all')
     wifi_network_config = wifi_network_config.iloc[0:wifi_network_config.index.get_loc('Guest SSID')]
-    packet_counts = dfs[5].set_index(0).dropna(how='all')
+    packet_counts = dfs[6].set_index(0).dropna(how='all')
     packet_counts = packet_counts.rename(columns=packet_counts.iloc[0])
     packet_counts = packet_counts[packet_counts.index.notna()]
 
@@ -119,9 +121,9 @@ def compute_data_rates(stats1, stats2):
 
 
 def capture_all_stats(outdir='stats'):
-    stats = query_router_stats()
-    for key, df in stats._asdict().items():
-        df.to_csv(f'stats/{key}.csv')
+    stats = query_router_stats()._asdict()
+    for key in ['device_stats', 'device_count_by_interface', 'wifi_radio_stats', 'broadband_stats']:
+        stats[key].to_csv(f'stats/{key}.csv')
 
 if __name__ == '__main__':
     capture_all_stats()
