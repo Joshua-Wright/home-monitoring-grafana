@@ -173,8 +173,8 @@ def main():
     from datetime import datetime, timedelta
     from influxdb import InfluxDBClient
 
-    min_wait = 25 # seconds
-    max_wait = 45 # seconds
+    min_wait = 50 # seconds
+    max_wait = 70 # seconds
 
     def random_wait():
         wait_sec = random.randrange(int(min_wait), int(max_wait))
